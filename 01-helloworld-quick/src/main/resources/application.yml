@@ -3,7 +3,7 @@
 #
 #
 #person:
-#  last-name: zhangsan
+#  last-name: 李四
 #  age: 18
 #  boss: false
 #  birth: 2021/09/03
@@ -14,3 +14,29 @@
 #  dog:
 #    name: xg
 #    age: 2
+
+# --- 文档块
+
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: prod
+---
+server:
+  port: 8083
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+server:
+  port: 8084
+
+spring:
+  config:
+    activate:
+      on-profile: prod
