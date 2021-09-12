@@ -2478,7 +2478,7 @@ public class BasicErrorController extends AbstractErrorController {
 	}
 
 	@RequestMapping
-	@ResponseBody    //产生json数据，其他客户端来到这个方法处理；
+	@ResponseBody    //产生json数据，其他客户端（eg.postman）来到这个方法处理；
 	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
 		Map<String, Object> body = getErrorAttributes(request,
 				isIncludeStackTrace(request, MediaType.ALL));
@@ -2549,7 +2549,7 @@ protected ModelAndView resolveErrorView(HttpServletRequest request,
 }
 ```
 
-### 2）、如果定制错误响应：
+### 2）、如何定制错误响应：
 
 #### 	**1）、如何定制错误的页面；**
 
@@ -3339,6 +3339,11 @@ ip addr
 1、检查内核版本，必须是3.10及以上
 uname -r
 2、安装docker
+curl https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
+yum install -y https://download.docker.com/linux/fedora/30/x86_64/stable/Packages/containerd.io-1.2.6-3.3.fc30.x86_64.rpm
+yum install -y docker-ce 如果报错执行 yum install --allowerasing docker-ce
+docker version 查看版本
+
 yum install docker
 3、输入y确认安装
 4、启动docker
@@ -3405,6 +3410,83 @@ https://docs.docker.com/engine/reference/commandline/docker/
 
 ````
 
+### 解决Docker启动Tomcat容器，访问404问题
+
+原因：没有关闭防火墙或者Tomcat的webapps文件夹下没有东西
+排查和解决
+启动Tomcat容器
+
+```shell
+docker run -d -p 8888:8080 tomcat
+```
+
+查看已经启动的容器
+
+```shell
+docker ps
+```
+
+使用8888端口访问Tomcat失败
+先查看防火墙状况
+
+```shell
+service firewalld status
+```
+
+如果防火墙没关闭，先关闭防火墙
+
+```shell
+service firewalld stop
+```
+
+防火墙关闭时，防火墙的状态如下
+
+确定防火墙关闭但访问Tomcat还是失败之后，使用如下命名进入Tomcat的目录
+
+```shell
+docker exec -it c110e319cdd1(启动的Tomcat容器的容器id) /bin/bash
+```
+
+使用命令查看当前文件夹内的所有文件
+
+```shell
+ls -l
+```
+
+进入webapps文件夹下
+
+```shell
+cd webapps
+```
+
+查看webapps下的文件
+
+```shell
+ls -l
+```
+
+显示total 0，问题就出在这里，webapps文件夹下没有东西
+返回上一级目录
+
+```shell
+cd ..
+```
+
+删除webapps文件夹（-r是级联删除,-f是强制删除，不然文件夹是删不掉的）
+
+```shell
+rm -rf webapps
+```
+
+将webapps.dist文件夹下的内容复制到给webapps文件夹
+
+```shell
+rm webapps.dist webapps
+```
+
+
+
+此时再访问Tomcat，成功
 
 
 ### 3）、安装MySQL示例
@@ -3551,7 +3633,7 @@ schema-*.sql、data-*.sql
 默认规则：schema.sql，schema-all.sql；
 可以使用   
 	schema:
-      - classpath:department.sql
+      - classpath:schema-all.sql
       指定位置
 ```
 
