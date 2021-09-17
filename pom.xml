@@ -16,6 +16,7 @@
   <version>1.0-SNAPSHOT</version>
   <modules>
     <module>01-helloworld</module>
+      <module>qinh-spring-boot-starter</module>
   </modules>
 
 
